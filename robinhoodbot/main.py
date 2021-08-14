@@ -8,21 +8,17 @@ from misc import *
 from tradingstats import *
 from config import *
 
-#Log in to Robinhood
-#Put your username and password in a config.py file in the same directory (see sample file)
+# Log in to Robinhood
+# Put your username and password in a config.py file in the same directory (see sample file)
 login = r.login(rh_username,rh_password)
 
-#Safe divide by zero division function
+# Safe divide by zero division function
 def safe_division(n, d):
     return n / d if d else 0
 
 def get_historicals(ticker, intervalArg, spanArg, boundsArg):
-    history = r.get_stock_historicals(ticker,interval=intervalArg,span=spanArg,bounds=boundsArg)
-
-    #If it's not a stock ticker, try it as a crypto ticker
-    if(history is None or None in history):
-        history = r.get_crypto_historicals(ticker,interval=intervalArg,span=spanArg,bounds=boundsArg)
-
+    # If it's a ticker in this program, then it must be a crypto ticker
+    history = r.get_crypto_historicals(ticker,interval=intervalArg,span=spanArg,bounds=boundsArg)
     return history
 
 def get_watchlist_symbols():
@@ -31,7 +27,7 @@ def get_watchlist_symbols():
     """
     my_list_names = set()
     symbols = set()
-    
+
     watchlistInfo = r.get_all_watchlists()
     for watchlist in watchlistInfo['results']:
         listName = watchlist['display_name']
@@ -93,75 +89,6 @@ def get_modified_holdings():
         holdings[symbol].update({'bought_at': bought_at})
     return holdings
 
-def get_last_crossing(df, days, symbol="", direction=""):
-    """Searches for a crossing between two indicators for a given stock
-
-    Args:
-        df(pandas.core.frame.DataFrame): Pandas dataframe with columns containing the stock's prices, both indicators, and the dates
-        days(int): Specifies the maximum number of days that the cross can occur by
-        symbol(str): Symbol of the stock we're querying. Optional, used for printing purposes
-        direction(str): "above" if we are searching for an upwards cross, "below" if we are searching for a downwaords cross. Optional, used for printing purposes
-
-    Returns:
-        1 if the short-term indicator crosses above the long-term one
-        0 if there is no cross between the indicators
-        -1 if the short-term indicator crosses below the long-term one
-    """
-    prices = df.loc[:,"Price"]
-    shortTerm = df.loc[:,"Indicator1"]
-    LongTerm = df.loc[:,"Indicator2"]
-    dates = df.loc[:,"Dates"]
-    lastIndex = prices.size - 1
-    index = lastIndex
-    found = index
-    recentDiff = (shortTerm.at[index] - LongTerm.at[index]) >= 0
-    if((direction == "above" and not recentDiff) or (direction == "below" and recentDiff)):
-        return 0
-    index -= 1
-    while(index >= 0 and found == lastIndex and not np.isnan(shortTerm.at[index]) and not np.isnan(LongTerm.at[index]) \
-                        and ((pd.Timestamp("now", tz='UTC') - dates.at[index]) <= pd.Timedelta(str(days) + " days"))):
-        if(recentDiff):
-            if((shortTerm.at[index] - LongTerm.at[index]) < 0):
-                found = index
-        else:
-            if((shortTerm.at[index] - LongTerm.at[index]) > 0):
-                found = index
-        index -= 1
-    if(found != lastIndex):
-        if((direction == "above" and recentDiff) or (direction == "below" and not recentDiff)):
-            print(symbol + ": Short SMA crossed" + (" ABOVE " if recentDiff else " BELOW ") + "Long SMA at " + str(dates.at[found]) \
-                +", which was " + str(pd.Timestamp("now", tz='UTC') - dates.at[found]) + " ago", ", price at cross: " + str(prices.at[found]) \
-                + ", current price: " + str(prices.at[lastIndex]))
-        return (1 if recentDiff else -1)
-    else:
-        return 0
-
-def five_year_check(stockTicker):
-    """Figure out if a stock has risen or been created within the last five years.
-
-    Args:
-        stockTicker(str): Symbol of the stock we're querying
-
-    Returns:
-        True if the stock's current price is higher than it was five years ago, or the stock IPO'd within the last five years
-        False otherwise
-    """
-    instrument = r.get_instruments_by_symbols(stockTicker)
-    if(instrument is None or len(instrument) == 0):
-        return True
-    list_date = instrument[0].get("list_date")
-    if ((pd.Timestamp("now") - pd.to_datetime(list_date)) < pd.Timedelta("5 Y")):
-        return True
-    fiveyear =  get_historicals(stockTicker, "day", "5year", "regular")
-    if (fiveyear is None or None in fiveyear):
-        return True
-    closingPrices = []
-    for item in fiveyear:
-        closingPrices.append(float(item['close_price']))
-    recent_price = closingPrices[len(closingPrices) - 1]
-    oldest_price = closingPrices[0]
-    return (recent_price > oldest_price)
-
 def golden_cross(stockTicker, n1, n2, days, direction=""):
     """Determine if a golden/death cross has occured for a specified stock in the last X trading days
 
@@ -182,13 +109,13 @@ def golden_cross(stockTicker, n1, n2, days, direction=""):
     """
     if(direction == "above" and not five_year_check(stockTicker)):
         return False
-    
+
     history = get_historicals(stockTicker, "day", "year", "regular")
 
-    #Couldn't get pricing data
+    # Couldn't get pricing data
     if(history is None or None in history):
         return False
-    
+
     closingPrices = []
     dates = []
     for item in history:
@@ -202,7 +129,7 @@ def golden_cross(stockTicker, n1, n2, days, direction=""):
     series = [price.rename("Price"), sma1.rename("Indicator1"), sma2.rename("Indicator2"), dates.rename("Dates")]
     df = pd.concat(series, axis=1)
     cross = get_last_crossing(df, days, symbol=stockTicker, direction=direction)
-    
+
     if(cross) and plot:
         show_plot(price, sma1, sma2, dates, symbol=stockTicker, label1=str(n1)+" day SMA", label2=str(n2)+" day SMA")
     return cross
@@ -248,17 +175,9 @@ def buy_holdings(potential_buys, profile_data, holdings_data):
         if not debug:
             r.order_buy_market(potential_buys[i], num_shares)
 
+
+
 def scan_stocks():
-    """ The main method. Sells stocks in your portfolio if their 50 day moving average crosses
-        below the 200 day, and buys stocks in your watchlist if the opposite happens.
-
-        ###############################################################################################
-        WARNING: Comment out the sell_holdings and buy_holdings lines if you don't actually want to execute the trade.
-        ###############################################################################################
-
-        If you sell a stock, this updates tradehistory.txt with information about the position,
-        how much you've earned/lost, etc.
-    """
     if debug:
         print("----- DEBUG MODE -----\n")
     print("----- Starting scan... -----\n")
@@ -270,19 +189,13 @@ def scan_stocks():
     sells = []
     print("Current Portfolio: " + str(portfolio_symbols) + "\n")
     print("Current Watchlist: " + str(watchlist_symbols) + "\n")
-    print("----- Scanning portfolio for stocks to sell -----\n")
-    for symbol in portfolio_symbols:
-        cross = golden_cross(symbol, n1=50, n2=200, days=30, direction="below")
-        if(cross == -1):
-            sell_holdings(symbol, holdings_data)
-            sells.append(symbol)
+    print("----- Scanning portfolio for assets to sell -----\n")
+    # Add your own selling logic here
+
     profile_data = r.build_user_profile()
-    print("\n----- Scanning watchlist for stocks to buy -----\n")
-    for symbol in watchlist_symbols:
-        if(symbol not in portfolio_symbols):
-            cross = golden_cross(symbol, n1=50, n2=200, days=10, direction="above")
-            if(cross == 1):
-                potential_buys.append(symbol)
+    print("\n----- Scanning watchlist for assets to buy -----\n")
+    # Add your own buying logic here
+
     if(len(potential_buys) > 0):
         buy_holdings(potential_buys, profile_data, holdings_data)
     if(len(sells) > 0):
@@ -291,5 +204,5 @@ def scan_stocks():
     if debug:
         print("----- DEBUG MODE -----\n")
 
-#execute the scan
+# Execute the scan
 scan_stocks()
