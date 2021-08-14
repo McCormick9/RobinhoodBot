@@ -19,6 +19,18 @@ Robinhood shields me from the transaction fees of crypto transactions. Since I p
 
 This is my MVP (minimum viable product) after all! It's not going to be perfect the first time. But it will hopefully get better with each iteration. If you are an open source developer who would like to collaborate on this, please let me know, and please forgive me in advance for any ignorance I might have of dev customs/best-practices. I started learning to code last year. LOL.  
 
+## What do I need to do to get started:
+
+Install pip on the machine you plan to use as this bot's home.
+
+<code>sudo apt install python3-pip</code>
+
+<code>sudo pip3 install robin_stocks</code>
+<code>sudo pip3 install pandas</code>
+<code>sudo pip3 install ta</code>
+I also need to upgrade my version of numpy, since it is outdated:
+<code>sudo pip3 install numpy --upgrade</code>
+<code>sudo pip3 install matplotlib</code>
 ## For more info:
 
 Email mccormick9 (at) protonmail (dot) com.

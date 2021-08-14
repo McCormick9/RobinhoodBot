@@ -161,3 +161,52 @@ def scan_stocks():
 
 # Execute the scan
 # scan_stocks()
+# get_historicals("DOGE", "15second", "month", "24_7")
+# print(r.get_crypto_historicals(symbol="DOGE",interval="15second",span="month",bounds="24_7"))
+
+# print(r.get_crypto_info("DOGE"))  # Gets general info on Dogecoin
+
+# print(r.load_account_profile())
+
+# Gather info on DOGE
+doge_quote = r.get_crypto_quote("DOGE")
+print(doge_quote)
+print("\n")
+
+doge_ask_price = doge_quote["ask_price"]
+print("DOGE ask price:", doge_ask_price)
+
+doge_bid_price = doge_quote["bid_price"]
+print("DOGE bid price:", doge_bid_price)
+
+# Check cash available for trading.
+my_theoretical_buying_power = r.load_account_profile()["buying_power"]
+savings_amount = 20  # This is off-limits for trading
+my_real_buying_power = float(my_theoretical_buying_power) - savings_amount  # My real tradable buying power.
+print("My USD trading supply: $", my_real_buying_power)
+
+# Check my DOGE supply
+
+my_crypto_positions = r.get_crypto_positions()
+my_doge_position = my_crypto_positions[2]["quantity_available"]
+print("My DOGE trading supply: Ð", my_doge_position)
+
+
+
+# Here is my own trading strategy code --Jonathan McCormick:
+
+# def jm_trading_strategy():
+    # Check cash (USD) balance
+
+    # Organize cash and DOGE into tiers
+    # Gather price information
+    # if-statements for buying
+    #     if tier_buy_price >= actual_price:
+    #         if cash in tier > 0:
+    #            limit_buy_order() for amount of cash in tier
+    # if-statements for selling
+    #     if tier_sell_price >= actual_price:
+    #         if DOGE in tier:
+    #            limit_sell_order() for amount of DOGE in tier
+
+    # Execute orders
