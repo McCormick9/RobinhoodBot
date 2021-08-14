@@ -160,4 +160,4 @@ def scan_stocks():
         print("----- DEBUG MODE -----\n")
 
 # Execute the scan
-scan_stocks()
+# scan_stocks()
