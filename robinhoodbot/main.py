@@ -164,49 +164,91 @@ def scan_stocks():
 # get_historicals("DOGE", "15second", "month", "24_7")
 # print(r.get_crypto_historicals(symbol="DOGE",interval="15second",span="month",bounds="24_7"))
 
-# print(r.get_crypto_info("DOGE"))  # Gets general info on Dogecoin
-
-# print(r.load_account_profile())
-
-# Gather info on DOGE
-doge_quote = r.get_crypto_quote("DOGE")
-print(doge_quote)
-print("\n")
-
-doge_ask_price = doge_quote["ask_price"]
-print("DOGE ask price:", doge_ask_price)
-
-doge_bid_price = doge_quote["bid_price"]
-print("DOGE bid price:", doge_bid_price)
-
-# Check cash available for trading.
-my_theoretical_buying_power = r.load_account_profile()["buying_power"]
-savings_amount = 20  # This is off-limits for trading
-my_real_buying_power = float(my_theoretical_buying_power) - savings_amount  # My real tradable buying power.
-print("My USD trading supply: $", my_real_buying_power)
-
-# Check my DOGE supply
-
-my_crypto_positions = r.get_crypto_positions()
-my_doge_position = my_crypto_positions[2]["quantity_available"]
-print("My DOGE trading supply: Ð", my_doge_position)
 
 
 
-# Here is my own trading strategy code --Jonathan McCormick:
 
-# def jm_trading_strategy():
-    # Check cash (USD) balance
+# Organize cash and DOGE into tiers
 
-    # Organize cash and DOGE into tiers
-    # Gather price information
-    # if-statements for buying
-    #     if tier_buy_price >= actual_price:
-    #         if cash in tier > 0:
-    #            limit_buy_order() for amount of cash in tier
-    # if-statements for selling
-    #     if tier_sell_price >= actual_price:
-    #         if DOGE in tier:
-    #            limit_sell_order() for amount of DOGE in tier
+# if-statements for buying
+# if tier_buy_price >= actual_price:
+# if cash in tier > 0:
+# limit_buy_order() for amount of cash in tier
+# if-statements for selling
+# if tier_sell_price >= actual_price:
+# if DOGE in tier:
+# imit_sell_order() for amount of DOGE in tier
 
-    # Execute orders
+def jm_trading_strategy():  # Here is my own trading strategy code --Jonathan McCormick:
+    zero = 0
+    while zero == 0:  # This must be continuous.
+
+        # Gather price info on DOGE.
+        doge_quote = r.get_crypto_quote("DOGE")
+        doge_ask_price, doge_bid_price = doge_quote["ask_price"], doge_quote["bid_price"]
+        print("DOGE ask price:", doge_ask_price, "\nDOGE bid price:", doge_bid_price)
+
+        # Check my USD available for trading.
+        my_theoretical_buying_power = r.load_account_profile()["buying_power"]
+        savings_amount = 20  # This is off-limits for trading.
+        my_usd_to_trade = float(my_theoretical_buying_power) - savings_amount  # My real tradable buying power.
+        print("My USD trading supply: $", my_usd_to_trade)
+
+        # Check my DOGE available for trading.
+        my_crypto_positions = r.get_crypto_positions()
+        my_doge_to_trade = my_crypto_positions[2]["quantity_available"]
+        print("My DOGE trading supply: Ð", my_doge_to_trade)
+
+        # Create tiers.
+        characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzαβγδεζηθικλμνξπρσςτυφψω"
+        print("Num of characters =", len(characters))
+        num_of_tiers = 20
+        tiers = []
+        tier_counter = 0
+
+        for character in characters:
+            if num_of_tiers > tier_counter:
+                tiers.append("Tier " + str(character))
+                tier_counter += 1
+
+        tier_dictionary = {}
+        for tier in tiers:
+            tier_dictionary[tier] = None
+
+        print(tier_dictionary)
+
+        # Math. #NeedsWork
+        number_of_tiers = 20
+        z = 1
+        t = 4
+        y = 1.1
+        tier_ranges = []
+        sum_of_tier_ranges = 0
+        while z <= number_of_tiers:
+            tier_ranges.append(y**z)
+            print("1.1 **", z, " = ", y**z)
+            sum_of_tier_ranges += y**z
+
+            z += 1
+
+        print("Sum of tier ranges:", sum_of_tier_ranges)
+
+        sum_of_tier_ranges = 0
+        for range in tier_ranges:
+            sum_of_tier_ranges += range
+
+        print("Sum of tier ranges:", sum_of_tier_ranges)
+
+        x = t / sum_of_tier_ranges
+        print("X =", x)
+
+        print("X * (Y ** 1) =", x * (y ** 1))
+
+        # Assign USD to tiers.
+        usd_per_tier = my_usd_to_trade / num_of_tiers
+
+        # Assign DOGE to tiers.
+
+        # Execute orders
+    return "Exited trading for now."
+jm_trading_strategy()
