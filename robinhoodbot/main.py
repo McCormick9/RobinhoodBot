@@ -252,3 +252,4 @@ def jm_trading_strategy():  # Here is my own trading strategy code --Jonathan Mc
         # Execute orders
     return "Exited trading for now."
 jm_trading_strategy()
+# This is a comment
