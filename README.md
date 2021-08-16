@@ -32,5 +32,5 @@ I also need to upgrade my version of numpy, since it is outdated:
 <code>sudo pip3 install numpy --upgrade</code>
 <code>sudo pip3 install matplotlib</code>
 ## For more info:
-
+Jonathan A. McCormick, Jr.
 Email mccormick9 (at) protonmail (dot) com.
