@@ -17,7 +17,7 @@ Another benefit of starting with cryptocurrencies is that the trading hours neve
 
 Robinhood shields me from the transaction fees of crypto transactions. Since I plan for my bot to do a lot of transactions, all those fees would likely threaten my profits if I were trading crypto at an exchange. Obviously, having zero fees to trade is a huge incentive. However, one downside to using Robinhood is that I do not actually control the keys to my crypto, but instead need to trust Robinhood as a third-party steward of my keys. Nonetheless, I consider the tradeoff to be worth it. I will want to be on the lookout for ways to cut out the need for a third-party, but first things first: I need to test that my concept even works, and only then figure out how to make it decentralized, anonymous, etc.
 
-This is my MVP (minimum viable product) after all! It's not going to be perfect the first time. But it will hopefully get better with each iteration. If you are an open source developer who would like to collaborate on this, please let me know, and please forgive me in advance for any ignorance I might have of dev customs/best-practices. I started learning to code last year. LOL.  
+This is my MVP (minimum viable product) after all! It's not going to be perfect the first time. But it will hopefully get better with each iteration. If you are an open source developer who would like to collaborate on this, please let me know, and please forgive me in advance for any ignorance I might have of developer customs/best-practices. I started learning to code last year. LOL.  
 
 ## What do I need to do to get started:
 
