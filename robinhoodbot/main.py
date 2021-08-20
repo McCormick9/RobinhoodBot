@@ -190,66 +190,75 @@ def jm_trading_strategy():  # Here is my own trading strategy code --Jonathan Mc
 
         # Check my USD available for trading.
         my_theoretical_buying_power = r.load_account_profile()["buying_power"]
-        savings_amount = 20  # This is off-limits for trading.
+        savings_amount = 20  # This is off-limits for trading. Value is measured in USD.
         my_usd_to_trade = float(my_theoretical_buying_power) - savings_amount  # My real tradable buying power.
         print("My USD trading supply: $", my_usd_to_trade)
 
         # Check my DOGE available for trading.
         my_crypto_positions = r.get_crypto_positions()
-        my_doge_to_trade = my_crypto_positions[2]["quantity_available"]
+        my_doge_to_trade = float(my_crypto_positions[2]["quantity_available"])
         print("My DOGE trading supply: Ð", my_doge_to_trade)
 
         # Create tiers.
-        characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzαβγδεζηθικλμνξπρσςτυφψω"
-        print("Num of characters =", len(characters))
-        num_of_tiers = 20
+        num_of_tiers = 100
         tiers = []
+        tier_increment_size = 0.01  # Value in USD
+        tier_buy_price = 0.01  # The lowest price I expect DOGE to go (for these purposes)
+        tier_sell_price = tier_buy_price + tier_increment_size
+
         tier_counter = 0
 
-        for character in characters:
-            if num_of_tiers > tier_counter:
-                tiers.append("Tier " + str(character))
-                tier_counter += 1
+        while num_of_tiers > tier_counter:
+            tiers.append("Tier " + str(tier_counter))
+            tier_counter += 1
 
         tier_dictionary = {}
         for tier in tiers:
-            tier_dictionary[tier] = None
+
+            tier_doge_supply = my_doge_to_trade / num_of_tiers
+            tier_usd_supply = my_usd_to_trade / num_of_tiers
+
+
+            tier_dictionary[tier] = [tier_buy_price, tier_sell_price, tier_doge_supply, tier_usd_supply]
+            tier_buy_price += tier_increment_size
+            tier_sell_price += tier_increment_size
+
+
+
 
         print(tier_dictionary)
+        print("DOGE supply per tier: " + str(tier_doge_supply) + "\nUSD supply per tier:" + str(tier_usd_supply))
 
-        # Math. #NeedsWork
-        number_of_tiers = 20
-        z = 1
-        t = 4
-        y = 1.1
-        tier_ranges = []
-        sum_of_tier_ranges = 0
-        while z <= number_of_tiers:
-            tier_ranges.append(y**z)
-            print("1.1 **", z, " = ", y**z)
-            sum_of_tier_ranges += y**z
+        for tier in tier_dictionary:
 
-            z += 1
+            # Math.
+            def doge_buy(amountInDollars, limitPrice):
+                r.order_buy_crypto_limit_by_price('DOGE', amountInDollars, limitPrice, timeInForce='gfd', jsonify=True)
 
-        print("Sum of tier ranges:", sum_of_tier_ranges)
+            def doge_sell(amountInDollars, limitPrice):
+                r.order_sell_crypto_limit_by_price('DOGE', amountInDollars, limitPrice, timeInForce='gfd', jsonify=True)
 
-        sum_of_tier_ranges = 0
-        for range in tier_ranges:
-            sum_of_tier_ranges += range
+            # if seller price is less than your buying price, then place a limit buy order for 1 DOGE
+            if doge_ask_price <= tier[0]:
+                amount_of_doge_to_buy = 1 / float(tier[0])
+                print(amount_of_doge_to_buy)
+                #doge_buy(tier_dictionary[tier_usd_supply], tier_buy_price)
 
-        print("Sum of tier ranges:", sum_of_tier_ranges)
+            # if buyer price is more than your selling price, then place a limit sell order for 1 DOGE
+            """if doge_bid_price > tier[1]:
 
-        x = t / sum_of_tier_ranges
-        print("X =", x)
+                doge_sell(doge, ___)"""
+            # Assign USD to tiers.
+            #usd_per_tier = my_usd_to_trade / num_of_tiers
 
-        print("X * (Y ** 1) =", x * (y ** 1))
+            # Assign DOGE to tiers.
 
-        # Assign USD to tiers.
-        usd_per_tier = my_usd_to_trade / num_of_tiers
+            # Execute orders
 
-        # Assign DOGE to tiers.
+        # Record data
+        if(len(sells) > 0):
+            update_trade_history(sells, holdings_data, "tradehistory.txt")
 
-        # Execute orders
     return "Exited trading for now."
 jm_trading_strategy()
 # This is a comment
