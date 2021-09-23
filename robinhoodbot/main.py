@@ -254,6 +254,11 @@ def jm_trading_strategy():  # Here is my own trading strategy code --Jonathan Mc
             # Assign DOGE to tiers.
 
             # Execute orders
+            
+            """
+            Consider whether or not to have some sort of emergency stop switch which will trigger if the net account value falls x% within x amount of time.
+            You can always resume the bot manually. 
+            """
 
         # Record data
         if(len(sells) > 0):
