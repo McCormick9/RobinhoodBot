@@ -180,8 +180,8 @@ def scan_stocks():
 # imit_sell_order() for amount of DOGE in tier
 
 def jm_trading_strategy():  # Here is my own trading strategy code --Jonathan McCormick:
-    zero = 0
-    while zero == 0:  # This must be continuous.
+    actively_trading = True
+    while actively_trading == True:
 
         # Gather price info on DOGE.
         doge_quote = r.get_crypto_quote("DOGE")
